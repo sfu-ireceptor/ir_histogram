@@ -1,0 +1,6 @@
+# We rely on the compute modules to provide most python requirements
+# Special requirements are the AIRR module and Anndata.
+airr==1.4.1
+anndata
+scanpy
+
