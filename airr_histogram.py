@@ -24,9 +24,13 @@ def performQueryAnalysis(input_file, field_name, num_values, sort_values=False):
         print("ERROR: Could not find " + field_name + " in file ", input_file)
         return None
 
-    # Count up the number for each column value.
+    # Count up the number for each column value. Sort on values if
+    # required, sort on the index if not.
     counts = airr_df[field_name].value_counts(sort=sort_values)
+    if sort_values == False:
+        counts = counts.sort_index()
 
+    # Take the first num_values records only.
     if num_values > 0:
         counts = counts.head(num_values)
 
@@ -34,7 +38,7 @@ def performQueryAnalysis(input_file, field_name, num_values, sort_values=False):
 
 def plotData(plot_data, title, filename):
 
-    # Get the sixe of the data we are plotting
+    # Get the size of the data we are plotting
     plot_size = len(plot_data)
     print(plot_data)
 
@@ -45,7 +49,6 @@ def plotData(plot_data, title, filename):
     plot_height_inches = plot_size / rows_per_inch
     if plot_height_inches < 1.0:
         plot_height_inches = 1.0
-
 
     # Create the graph...
     fig, ax = plt.subplots()
@@ -65,7 +68,7 @@ def plotData(plot_data, title, filename):
 
     # Set the size of the figure.
     fig.set_figheight(int(plot_height_inches))
-    
+
     # Calculate a reasonable output DPI - images can be
     # very large if there are a lot of gene calls. Max
     # resolution is 65536 (2^16)
@@ -112,9 +115,11 @@ if __name__ == "__main__":
         sort = True
     else:
         sort = False
+
     # Perform the query analysis, gives us back the data
     data = performQueryAnalysis(options.input_file, options.field_name,
                                 options.num_values, sort)
+
     # Graph the results if we got some...
     title = options.title 
     if not data is None:
@@ -124,6 +129,7 @@ if __name__ == "__main__":
         data.to_csv(options.tsv_output_file, sep = '\t')
     else:
         sys.exit(2)
+
     # Return success
     print("Done writing graph to " + options.png_output_file)
     print("Done writing data to " + options.tsv_output_file)
